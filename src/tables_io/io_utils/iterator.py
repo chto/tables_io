@@ -528,13 +528,13 @@ def iter_ds_to_table(
     batch_index = 0
 
     for batch in dataset.to_batches(columns=columns, batch_size=chunk_size):
+        num_rows = batch.num_rows
         if (batch_index % kwargs['parallel_size']) != kwargs['rank']:
             batch_index += 1
-            start += chunk_size
-            end += chunk_size
+            start += num_rows
+            end += num_rows
             continue
         data = pa.Table.from_pydict(batch.to_pydict())
-        num_rows = len(data)
         end += num_rows
         yield start, end, data
         start += num_rows
